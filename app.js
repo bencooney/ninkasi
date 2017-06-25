@@ -43,5 +43,9 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+app.get('/arduino', function(req, res){
+	res.send('hi')
+})
+
 module.exports = app;
 

@@ -1,0 +1,27 @@
+{
+  "name": "ninkasi",
+  "version": "1.0.0",
+  "description": "automated beer making",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.15.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bencooney/ninkasi.git"
+  },
+  "keywords": [
+    "beer",
+    "automation"
+  ],
+  "author": "Te Rangi Hanu Cooney",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bencooney/ninkasi/issues"
+  },
+  "homepage": "https://github.com/bencooney/ninkasi#readme"
+}

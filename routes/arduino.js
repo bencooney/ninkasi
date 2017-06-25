@@ -15,8 +15,9 @@ router.get('/', function(req, res, next) {
 
 
 router.get('/:device', function(req, res) {
+	//list details of the specified device
 	var device = req.params.device;
-	console.log('list resources on board ', device);
+	console.log('list details for board ', device);
 	var thisBoard = boards.byId(device)
 	res.send(JSON.stringify({ device:{ 
 			id: thisBoard.id,

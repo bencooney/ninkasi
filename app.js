@@ -11,9 +11,9 @@ var arduino = require('./routes/arduino');
 
 //scan for arduino devices to control
 var johnnyFive = require("johnny-five");
-var board = new johnnyFive.Board();
-board.on("ready", function() {
-	onboardLed = new johnnyFive.Led(13);
+boards = new johnnyFive.Boards(["A","B"]);
+boards.on("ready", function() { 
+	console.log('Ninkasi\'s devices have loaded.');
 });
 
 

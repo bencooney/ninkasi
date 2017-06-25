@@ -1,47 +1,55 @@
 var express = require('express');
+var johnnyFive = require("johnny-five");
+
 var router = express.Router();
 
 
 router.get('/', function(req, res, next) {
-	console.log('identifying resources available on the arduino...');
-	//scan for onewire thermometers
-	
-
-
-	console.log('listing resources available on the arduinos');
-	res.send(JSON.stringify({ sensors:{abc:1,cde:2}}));
+	//list devices
+	console.log("listing arduino devices");
+	var listOfBoards = [];
+	boards.each(function(board){listOfBoards.push(board.id);});
+	res.send(JSON.stringify({ devices:[ listOfBoards ]}));
 });
 
-router.get('/sensor/:resource', function(req, res) {
-	var resource = req.params.resource;
-	console.log('list value on sensor resource', resource);
-	res.send(JSON.stringify({ name: resource, value: 1234 }));
+
+
+router.get('/:device', function(req, res) {
+	var device = req.params.device;
+	console.log('list resources on board ', device);
+	var thisBoard = boards.byId(device)
+	res.send(JSON.stringify({ device:{ 
+			id: thisBoard.id,
+			port: thisBoard.port,
+			repl: thisBoard.repl,
+			debug: thisBoard.debug,
+			timeout: thisBoard.timeout
+	  } }));
 });
+
 
 
 
 
 //these really only exist to help debugging...
 
-router.get('/led/toggle', function(req, res){
-	console.log('toggle the onboard led');
-	onboardLed.toggle();
-	res.send(JSON.stringify({led:'toggle'}));
-});
-
-
-router.get('/led/on', function(req, res){
-	console.log('turn on the onboard led');
-	onboardLed.on();
+router.get('/:device/led/on', function(req, res){
+	console.log('turn on the onboard led on board ', req.params.device);
+	var led =	johnnyFive.Led({ pin:13, board: boards.byId(req.params.device)});
+	led.on();
 	res.send(JSON.stringify({led:true}));
 });
 
 
-router.get('/led/off', function(req, res){
-	console.log('turn off the onboard led');
-	onboardLed.off();
+router.get('/:device/led/off', function(req, res){
+	console.log('turn off the onboard led on board ', req.params.device);
+	var led =	johnnyFive.Led({ pin:13, board: boards.byId(req.params.device)});
+	led.off();
 	res.send(JSON.stringify({led:false}));
 });
+
+
+
 
 module.exports = router;
 

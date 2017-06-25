@@ -8,10 +8,12 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var arduino = require('./routes/arduino');
 
+
+//scan for arduino devices to control
 var johnnyFive = require("johnny-five");
 var board = new johnnyFive.Board();
 board.on("ready", function() {
-	led = new johnnyFive.Led(13);
+	onboardLed = new johnnyFive.Led(13);
 });
 
 

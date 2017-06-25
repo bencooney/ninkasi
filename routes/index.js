@@ -1,5 +1,10 @@
+
 var express = require('express');
+
 var router = express.Router();
+
+	
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -9,16 +14,10 @@ router.get('/', function(req, res, next) {
 
 
 router.get('/arduino', function(req, res){
-	var five = require("johnny-five");
-	var board = new five.Board();
-
-	board.on("ready", function() {
-	  var led = new five.Led(13);
-	  led.blink(500);
-	});
-
-	res.send('arduino');
+	led.toggle();
+	res.send('arduino toggle changed');
 });
 
-
 module.exports = router;
+
+

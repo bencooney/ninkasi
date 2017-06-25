@@ -8,6 +8,13 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 
+var johnnyFive = require("johnny-five");
+var board = new johnnyFive.Board();
+board.on("ready", function() {
+	led = new five.Led(13);
+});
+
+
 var app = express();
 
 // view engine setup
@@ -43,9 +50,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.get('/arduino', function(req, res){
-	res.send('hi')
-})
 
 module.exports = app;
 

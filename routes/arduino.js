@@ -34,7 +34,7 @@ router.get('/:device', function(req, res) {
 
 //these really only exist to help debugging...
 
-router.get('/:device/led/on', function(req, res){
+router.put('/:device/led/on', function(req, res){
 	console.log('turn on the onboard led on board ', req.params.device);
 	var led =	johnnyFive.Led({ pin:13, board: boards.byId(req.params.device)});
 	led.on();
@@ -42,7 +42,7 @@ router.get('/:device/led/on', function(req, res){
 });
 
 
-router.get('/:device/led/off', function(req, res){
+router.put('/:device/led/off', function(req, res){
 	console.log('turn off the onboard led on board ', req.params.device);
 	var led =	johnnyFive.Led({ pin:13, board: boards.byId(req.params.device)});
 	led.off();

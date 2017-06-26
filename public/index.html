@@ -7,11 +7,11 @@
 	    if(state){
 	    	mode = 'on'
 	    }
-	    httpGetAsync('/arduino/'+board+'/led/'+mode, function(){});
+	    httpPut('/arduino/'+board+'/led/'+mode, function(){});
 		}
 
 		function getBoards(){
-			httpGetAsync('/arduino/', function(devicesJson){
+			httpGet('/arduino/', function(devicesJson){
 				var listHtml = "";
 				JSON.parse(devicesJson).devices.forEach( function(obj){
 					listHtml += "<div>" +
@@ -29,7 +29,7 @@
 		}
 
 		function getBoardDetails(boardId){
-			httpGetAsync('/arduino/'+boardId, function(boardText){
+			httpGet('/arduino/'+boardId, function(boardText){
 				var boardJson = JSON.parse(boardText);
 				detailsHtml = "<list>"+
 					" <li><strong>port: </strong>"+boardJson.device.port+"</li>" +
@@ -48,14 +48,23 @@
 		  document.getElementById('cmdBoard'+boardId+'Details').setAttribute('onclick',"getBoardDetails('"+boardId+"')");
 		}
 
-		function httpGetAsync(theUrl, callback)
-		{
+		function httpGet(targetUrl, callback) {
 	    var xmlHttp = new XMLHttpRequest();
 	    xmlHttp.onreadystatechange = function() { 
-	        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-	            callback(xmlHttp.responseText);
+	      if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+	        callback(xmlHttp.responseText);
 	    }
-	    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+	    xmlHttp.open("GET", targetUrl, true); // true for asynchronous 
+	    xmlHttp.send(null);
+		}
+
+		function httpPut(targetUrl, callback) {
+			var xmlHttp = new XMLHttpRequest();
+	    xmlHttp.onreadystatechange = function() { 
+	      if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+	        callback(xmlHttp.responseText);
+	    }
+	    xmlHttp.open("PUT", targetUrl, true); // true for asynchronous 
 	    xmlHttp.send(null);
 		}
 	</script>

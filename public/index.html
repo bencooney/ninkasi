@@ -1,9 +1,46 @@
 <html>
 <head>
+	<script type="text/javascript">
+		function ledToggle(board, state) {
+	    console.log('sending led='+state+' to board ' + board );
+	    var mode = 'off';
+	    if(state){
+	    	mode = 'on'
+	    }
+	    httpGetAsync('/arduino/'+board+'/led/'+mode, function(){});
+		}
+
+		function httpGetAsync(theUrl, callback)
+		{
+	    var xmlHttp = new XMLHttpRequest();
+	    xmlHttp.onreadystatechange = function() { 
+	        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+	            callback(xmlHttp.responseText);
+	    }
+	    xmlHttp.open("GET", theUrl, true); // true for asynchronous 
+	    xmlHttp.send(null);
+		}
+	</script>
 </head>
 <body>
-<h1>ninkasi</h1>
-Connection Status: 
+	<h1>ninkasi</h1>
+	<div>
+		<h2>Device A:</h2>
+		<p>
+			LED
+			<button onclick="ledToggle('A',true)">On</button>
+			<button onclick="ledToggle('A',false)">Off</button>
+		</p>
+	</div>
 
+
+	<div>
+		<h2>Device B:</h2>
+		<p>
+			LED
+			<button onclick="ledToggle('B',true)">On</button>
+			<button onclick="ledToggle('B',false)">Off</button>
+		</p>
+	</div>
 </body>
 </html>

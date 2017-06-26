@@ -9,7 +9,7 @@ var index = require('./routes/index');
 var arduino = require('./routes/arduino');
 
 
-//scan for arduino devices to control
+//setup arduino devices to control
 var johnnyFive = require("johnny-five");
 boards = new johnnyFive.Boards(["A","B"]);
 boards.on("ready", function() { 

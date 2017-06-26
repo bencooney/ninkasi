@@ -10,6 +10,44 @@
 	    httpGetAsync('/arduino/'+board+'/led/'+mode, function(){});
 		}
 
+		function getBoards(){
+			httpGetAsync('/arduino/', function(devicesJson){
+				var listHtml = "";
+				JSON.parse(devicesJson).devices.forEach( function(obj){
+					listHtml += "<div>" +
+						"  <h3>Device: "+ obj +"</h3>" +
+						"  <p>LED"+
+						"    <button onclick=\"ledToggle('"+obj+"',true)\">On</button>" +
+						"    <button onclick=\"ledToggle('"+obj+"',false)\">Off</button>" +
+						"    <button id='cmdBoard"+obj+"Details' onclick=\"getBoardDetails('"+obj+"')\">\\/</button>" +
+						"    <div id='board"+obj+"Details'></div>"
+						"  </p>" +
+						"</div>";
+				});
+				document.getElementById('devices').innerHTML = listHtml;
+			});
+		}
+
+		function getBoardDetails(boardId){
+			httpGetAsync('/arduino/'+boardId, function(boardText){
+				var boardJson = JSON.parse(boardText);
+				detailsHtml = "<list>"+
+					" <li><strong>port: </strong>"+boardJson.device.port+"</li>" +
+					" <li><strong>repl: </strong>"+boardJson.device.repl+"</li>" +
+					" <li><strong>debug: </strong>"+boardJson.device.debug+"</li>" +
+					"</list>";
+				document.getElementById('board'+boardId+'Details').innerHTML = detailsHtml;
+				document.getElementById('cmdBoard'+boardId+'Details').innerHTML = "/\\";
+				document.getElementById('cmdBoard'+boardId+'Details').setAttribute('onclick',"hideBoardDetails('"+boardId+"')");
+			});
+		}
+
+		function hideBoardDetails(boardId){
+			document.getElementById('board'+boardId+'Details').innerHTML = "";
+			document.getElementById('cmdBoard'+boardId+'Details').innerHTML = "\\/";
+		  document.getElementById('cmdBoard'+boardId+'Details').setAttribute('onclick',"getBoardDetails('"+boardId+"')");
+		}
+
 		function httpGetAsync(theUrl, callback)
 		{
 	    var xmlHttp = new XMLHttpRequest();
@@ -22,25 +60,12 @@
 		}
 	</script>
 </head>
-<body>
+<body onload="getBoards()">
 	<h1>ninkasi</h1>
 	<div>
-		<h2>Device A:</h2>
-		<p>
-			LED
-			<button onclick="ledToggle('A',true)">On</button>
-			<button onclick="ledToggle('A',false)">Off</button>
-		</p>
-	</div>
-
-
-	<div>
-		<h2>Device B:</h2>
-		<p>
-			LED
-			<button onclick="ledToggle('B',true)">On</button>
-			<button onclick="ledToggle('B',false)">Off</button>
-		</p>
+		<h2>Devices</h2>
+		<div id='devices'>
+		</div>
 	</div>
 </body>
 </html>

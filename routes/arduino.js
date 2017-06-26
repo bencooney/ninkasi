@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 	console.log("listing arduino devices");
 	var listOfBoards = [];
 	boards.each(function(board){listOfBoards.push(board.id);});
-	res.send(JSON.stringify({ devices:[ listOfBoards ]}));
+	res.send(JSON.stringify({ devices:listOfBoards }));
 });
 
 

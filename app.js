@@ -7,13 +7,18 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var arduino = require('./routes/arduino');
+var raspiLocal = require('./routes/raspi-local');
 
 
 //setup arduino devices to control
 var johnnyFive = require("johnny-five");
-boards = new johnnyFive.Boards(["A","B"]);
+boards = new johnnyFive.Boards([
+	{id:"A",timeout:36000, port:"/dev/ttyUSB0"}
+	,{id:"B",timeout:36000, port:"/dev/ttyUSB1"}
+	,{id:"C",timeout:36000, port:"/dev/ttyACM0"}
+]);
 boards.on("ready", function() { 
-	console.log('Ninkasi\'s devices have loaded.');
+	console.log('Ninkasi\'s johnny-five devices have loaded.');
 });
 
 
@@ -33,6 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/arduino', arduino);
+app.use('/raspi-local', raspiLocal);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

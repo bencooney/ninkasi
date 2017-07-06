@@ -12,13 +12,27 @@ var raspiLocal = require('./routes/raspi-local');
 
 //setup arduino devices to control
 var johnnyFive = require("johnny-five");
+var Raspi = require("raspi-io");
+
 boards = new johnnyFive.Boards([
 	{id:"A",timeout:36000, port:"/dev/ttyUSB0"}
 	,{id:"B",timeout:36000, port:"/dev/ttyUSB1"}
 	,{id:"C",timeout:36000, port:"/dev/ttyACM0"}
+	,{id:"raspi",io: new Raspi()}
 ]);
 boards.on("ready", function() { 
 	console.log('Ninkasi\'s johnny-five devices have loaded.');
+	
+//	var thermometer = new johnnyFive.Thermometer({
+//		board: boards.byId('A'),
+//		controller: "DS18B20",
+//		pin: 4
+//	});
+
+//	thermometer.on("change", function(){
+//		console.log(this.celsius + "C");
+//	});
+
 });
 
 

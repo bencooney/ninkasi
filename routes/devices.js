@@ -19,13 +19,43 @@ router.get('/:device', function(req, res) {
 	var device = req.params.device;
 	console.log('list details for board ', device);
 	var thisBoard = boards.byId(device)
-	res.send(JSON.stringify({ device:{ 
-			id: thisBoard.id,
-			port: thisBoard.port,
-			repl: thisBoard.repl,
-			debug: thisBoard.debug,
-			timeout: thisBoard.timeout
-	  } }));
+	var resources;
+	if(thisBoard.id==="fermentorTracker"){
+
+		var thermometer = new johnnyFive.Thermometer({
+			board: thisBoard,
+			controller: "DS18B20",
+			pin: 4
+		});
+
+		thermometer.on("data", function(){
+			resources.push = this.address.toString(16);
+		});
+
+
+
+		res.send(JSON.stringify({ device:{ 
+				id: thisBoard.id,
+				port: thisBoard.port,
+				repl: thisBoard.repl,
+				debug: thisBoard.debug,
+				timeout: thisBoard.timeout,
+				'resources': resources
+		  } 
+		}));
+
+	}else{
+
+
+		res.send(JSON.stringify({ device:{ 
+				id: thisBoard.id,
+				port: thisBoard.port,
+				repl: thisBoard.repl,
+				debug: thisBoard.debug,
+				timeout: thisBoard.timeout
+		  } 
+		}));
+	}
 });
 
 

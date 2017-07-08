@@ -15,7 +15,7 @@ var Raspi = require("raspi-io");
 
 boards = new johnnyFive.Boards([
 	{id:"A",timeout:36000, port:"/dev/ttyUSB0"}
-	,{id:"B",timeout:36000, port:"/dev/ttyUSB1"}
+	,{id:"fermentorTracker",timeout:36000, port:"/dev/ttyUSB1"}
 	,{id:"C",timeout:36000, port:"/dev/ttyACM0"}
 	,{id:"raspi",io: new Raspi()}
 ]);

@@ -19,9 +19,9 @@ router.get('/:device', function(req, res) {
 	var device = req.params.device;
 	console.log('list details for board ', device);
 	var thisBoard = boards.byId(device)
-	var resources;
+	var resources = [];
 	if(thisBoard.id==="fermentorTracker"){
-
+		console.log("checking for thermometers")
 		var thermometer = new johnnyFive.Thermometer({
 			board: thisBoard,
 			controller: "DS18B20",

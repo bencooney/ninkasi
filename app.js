@@ -5,34 +5,54 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var pgp = require('pg-promise')(/*options*/)
+var db = pgp('postgres://ninkasi:ninkasi@127.0.0.1/ninkasi')
+
+db.one('SELECT $1 AS value', 123)
+  .then(function (data) {
+    console.log('DATA:', data.value)
+  })
+  .catch(function (error) {
+    console.log('ERROR:', error)
+  })
+
+
+
+
 var index = require('./routes/index');
 var devices = require('./routes/devices');
 
+var osHostname = require('os-hostname');
+osHostname(function(err, hostname){
+	if(hostname==='raspi'){
 
-//setup arduino devices to control
-var johnnyFive = require("johnny-five");
-var Raspi = require("raspi-io");
+		//setup arduino devices to control
+		var johnnyFive = require("johnny-five");
+		var Raspi = require("raspi-io");
 
-boards = new johnnyFive.Boards([
-	{id:"A",timeout:36000, port:"/dev/ttyUSB0"}
-	,{id:"fermentorTracker",timeout:36000, port:"/dev/ttyUSB1"}
-	,{id:"C",timeout:36000, port:"/dev/ttyACM0"}
-	,{id:"raspi",io: new Raspi()}
-]);
-boards.on("ready", function() { 
-	console.log('Ninkasi\'s johnny-five devices have loaded.');
-	/*
-	var thermometer = new johnnyFive.Thermometer({
-		board: boards.byId('fermentorTracker'),
-		controller: "DS18B20",
-		pin: 4
-	});
+		boards = new johnnyFive.Boards([
+			{id:"A",timeout:36000, port:"/dev/ttyUSB0"}
+			,{id:"fermentorTracker",timeout:36000, port:"/dev/ttyUSB1"}
+			,{id:"C",timeout:36000, port:"/dev/ttyACM0"}
+			,{id:"raspi",io: new Raspi()}
+		]);
+		boards.on("ready", function() { 
+			console.log('Ninkasi\'s johnny-five devices have loaded.');
+			/*
+			var thermometer = new johnnyFive.Thermometer({
+				board: boards.byId('fermentorTracker'),
+				controller: "DS18B20",
+				pin: 4
+			});
 
-	thermometer.on("change", function(){
-		console.log(this.celsius + "C");
-	});*/
+			thermometer.on("change", function(){
+				console.log(this.celsius + "C");
+			});*/
 
+		});
+	}
 });
+
 var app = express();
 
 // view engine setup

@@ -13,12 +13,7 @@ db.one(`CREATE TABLE IF NOT EXISTS temperatures(
 					address VARCHAR(64),
 					value REAL 
 				);`)
-  .then(function (data) {
-    console.log('DATA:', data.value)
-  })
-  .catch(function (error) {
-    console.log('ERROR:', error)
-  })
+
 
 
 
@@ -42,7 +37,8 @@ osHostname(function(err, hostname){
 		]);
 		boards.on("ready", function() { 
 			console.log('Ninkasi\'s johnny-five devices have loaded.');
-			/*
+
+
 			var thermometer = new johnnyFive.Thermometer({
 				board: boards.byId('fermentorTracker'),
 				controller: "DS18B20",
@@ -50,6 +46,7 @@ osHostname(function(err, hostname){
 			});
 
 			thermometer.on("change", function(){
+				db.one("INSERT INTO temperatures(address, value) VALUES("+this.address+","+this.celsius+");");
 				console.log(this.celsius + "C");
 			});*/
 

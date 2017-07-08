@@ -48,7 +48,7 @@ osHostname(function(err, hostname){
 			thermometer.on("change", function(){
 				db.one("INSERT INTO temperatures(address, value) VALUES("+this.address+","+this.celsius+");");
 				console.log(this.celsius + "C");
-			});*/
+			});
 
 		});
 	}

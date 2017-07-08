@@ -23,19 +23,17 @@ boards = new johnnyFive.Boards([
 boards.on("ready", function() { 
 	console.log('Ninkasi\'s johnny-five devices have loaded.');
 	
-//	var thermometer = new johnnyFive.Thermometer({
-//		board: boards.byId('A'),
-//		controller: "DS18B20",
-//		pin: 4
-//	});
+	var thermometer = new johnnyFive.Thermometer({
+		board: boards.byId('B'),
+		controller: "DS18B20",
+		pin: 4
+	});
 
-//	thermometer.on("change", function(){
-//		console.log(this.celsius + "C");
-//	});
+	thermometer.on("change", function(){
+		console.log(this.celsius + "C");
+	});
 
 });
-
-
 var app = express();
 
 // view engine setup

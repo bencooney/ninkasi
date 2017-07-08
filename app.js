@@ -23,7 +23,7 @@ boards.on("ready", function() {
 	console.log('Ninkasi\'s johnny-five devices have loaded.');
 	
 	var thermometer = new johnnyFive.Thermometer({
-		board: boards.byId('B'),
+		board: boards.byId('fermentorTracker'),
 		controller: "DS18B20",
 		pin: 4
 	});

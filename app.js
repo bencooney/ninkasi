@@ -6,8 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
-var arduino = require('./routes/arduino');
-var raspiLocal = require('./routes/raspi-local');
+var devices = require('./routes/devices');
 
 
 //setup arduino devices to control
@@ -49,8 +48,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/arduino', arduino);
-app.use('/raspi-local', raspiLocal);
+app.use('/devices', devices);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

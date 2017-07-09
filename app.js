@@ -20,6 +20,7 @@ db.one(`CREATE TABLE IF NOT EXISTS temperatures(
 
 var index = require('./routes/index');
 var devices = require('./routes/devices');
+var thermometers = require('./routes/thermometers');
 
 var osHostname = require('os-hostname');
 osHostname(function(err, hostname){
@@ -37,18 +38,11 @@ osHostname(function(err, hostname){
 		]);
 		boards.on("ready", function() { 
 			console.log('Ninkasi\'s johnny-five devices have loaded.');
-
-
-			var thermometer = new johnnyFive.Thermometer({
-				board: boards.byId('fermentorTracker'),
-				controller: "DS18B20",
-				pin: 4
-			});
-
-			thermometer.on("change", function(){
-				db.one("INSERT INTO temperatures(address, value) VALUES("+this.address+","+this.celsius+");");
-				console.log(this.celsius + "C");
-			});
+			
+			initThermometer(db, johnnyFive, boards.byId('fermentorTracker'), 0x63ea3e8);
+			initThermometer(db, johnnyFive, boards.byId('fermentorTracker'), 0x63d8724);
+			
+			
 
 		});
 	}
@@ -70,7 +64,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/devices', devices);
-
+app.use('/thermometers', thermometers);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -93,3 +87,32 @@ app.use(function(err, req, res, next) {
 
 module.exports = app;
 
+function initThermometer(db, johnnyFive, boardId, addressCode){
+	var thermometerA = new johnnyFive.Thermometer({
+		board: boardId,
+		controller: "DS18B20",
+		pin: 4,
+		freq: 10000
+		,address: addressCode
+	});
+
+	thermometerA.on('error', function(err){
+		console.log("Error: " + err);
+	});
+
+	thermometerA.on("change", function(){
+		if(this.celsius>4000){
+			console.log("Bad Reading!!");
+		} else {
+			db.none("INSERT INTO temperatures(address, value) VALUES($1,$2);",["0x"+this.address.toString(16),this.celsius])
+				.then(function(data){})
+				.catch(function(erro){
+					console.log("SQL Error: " + erro);
+				});
+		}
+		console.log(this.address.toString(16) + " - " + this.id + " - " + this.celsius + "C");
+	});
+
+	console.log("initialised Thermometer Sensor: " + thermometerA.address.toString(16));
+
+}

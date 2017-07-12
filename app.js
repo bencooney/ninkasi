@@ -22,30 +22,32 @@ var index = require('./routes/index');
 var devices = require('./routes/devices');
 var thermometers = require('./routes/thermometers');
 
-var osHostname = require('os-hostname');
-osHostname(function(err, hostname){
-	if(hostname==='raspberrypi'){
 
-		//setup arduino devices to control
-		var johnnyFive = require("johnny-five");
-		var Raspi = require("raspi-io");
+//setup arduino devices to control
+var johnnyFive = require("johnny-five");
+var Raspi = require("raspi-io");
 
-		boards = new johnnyFive.Boards([
-			{id:"A",timeout:36000, port:"/dev/ttyUSB0"}
-			,{id:"fermentorTracker",timeout:36000, port:"/dev/ttyUSB1"}
-			,{id:"C",timeout:36000, port:"/dev/ttyACM0"}
-			,{id:"raspi",io: new Raspi()}
-		]);
-		boards.on("ready", function() { 
-			console.log('Ninkasi\'s johnny-five devices have loaded.');
-			
-			initThermometer(db, johnnyFive, boards.byId('fermentorTracker'), 0x63ea3e8);
-			initThermometer(db, johnnyFive, boards.byId('fermentorTracker'), 0x63d8724);
-			
-			
+boards = new johnnyFive.Boards([
+	{id:"A",timeout:36000, port:"/dev/ttyUSB0"}
+	,{id:"fermentorTracker",timeout:36000, port:"/dev/ttyUSB1"}
+	,{id:"C",timeout:36000, port:"/dev/ttyACM0"}
+	,{id:"raspi",io: new Raspi()}
+]);
 
-		});
-	}
+boards.on("error", function(msg){
+	console.log("error found on board...",msg);
+});
+
+boards.on("ready", function() { 
+	console.log('Ninkasi\'s johnny-five devices have loaded.');
+	
+
+	initThermometer(db, johnnyFive, boards.byId('fermentorTracker'), 0x63d8724);
+	initThermometer(db, johnnyFive, boards.byId('fermentorTracker'), 0x63fd8dd);
+	initThermometer(db, johnnyFive, boards.byId('fermentorTracker'), 0x63ea3e8);
+	
+	
+
 });
 
 var app = express();
@@ -88,20 +90,25 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 function initThermometer(db, johnnyFive, boardId, addressCode){
-	var thermometerA = new johnnyFive.Thermometer({
+	
+	
+	
+
+	var thermometer = new johnnyFive.Thermometer({
 		board: boardId,
 		controller: "DS18B20",
 		pin: 4,
 		freq: 10000
 		,address: addressCode
+	})
+
+	thermometer.on('error', function(){
+		console.log("E$@!$!@Error found: ");
 	});
 
-	thermometerA.on('error', function(err){
-		console.log("Error: " + err);
-	});
-
-	thermometerA.on("change", function(){
-		if(this.celsius>4000){
+	thermometer.on("change", function(){
+		this.on("error",function(){"2321321error occurred"});
+		if(this.celsius>4000 || this.celsius==85){
 			console.log("Bad Reading!!");
 		} else {
 			db.none("INSERT INTO temperatures(address, value) VALUES($1,$2);",["0x"+this.address.toString(16),this.celsius])
@@ -113,6 +120,6 @@ function initThermometer(db, johnnyFive, boardId, addressCode){
 		console.log(this.address.toString(16) + " - " + this.id + " - " + this.celsius + "C");
 	});
 
-	console.log("initialised Thermometer Sensor: " + thermometerA.address.toString(16));
+	console.log("initialised Thermometer Sensor: " + thermometer.address.toString(16));
 
 }

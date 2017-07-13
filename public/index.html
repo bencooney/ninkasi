@@ -2,15 +2,34 @@
 <head>
 	<script type="text/javascript">
 		function ledToggle(board, state) {
-	    console.log('sending led='+state+' to board ' + board );
-	    var mode = 'off';
-	    if(state){
-	    	mode = 'on'
-	    }
-	    httpPut('/devices/'+board+'/led/'+mode, function(){});
+		    	console.log('sending led='+state+' to board ' + board );
+		    	var mode = 'off';
+		    	if(state){
+		    		mode = 'on'
+		    	}
+	   		httpPut('/devices/'+board+'/led/'+mode, function(){});
 		}
 
-		function getBoards(){
+		function loadSystem(){
+			
+			
+			httpGet('/thermometers/', function(thermsJson){
+				var thermsHtml = "";
+				
+				JSON.parse(thermsJson).sensors.forEach( function(therm){
+					thermsHtml += "<div>" +
+						"  <h3>Therm: " + therm.address + "</h3>" +
+						"  <div class='therm-info-buttons'>" +
+						"    <button onclick=\"showThermStats('"+therm.address+"')\">Minutely</button>" +
+						"    <button onclick=\"showThermStats('"+therm.address+"','hourly')\">Hourly</button>" +
+						"    <button onclick=\"showThermStats('"+therm.address+"','daily')\">Daily</button>" +
+						"    <div id=\"therm"+therm.address+"Data\"></div>" +	
+						"  </div>" + 
+						"</div>";
+				});
+				document.getElementById('thermometers').innerHTML = thermsHtml;
+			});
+
 			httpGet('/devices/', function(devicesJson){
 				var listHtml = "";
 				JSON.parse(devicesJson).devices.forEach( function(obj){
@@ -28,6 +47,22 @@
 			});
 		}
 
+		function showThermStats(thermAddress, freq){
+			var path = "/thermometers/" + thermAddress + "/track/"; 
+			if(freq){
+				path += freq; 
+			}
+			httpGet(path, function(tempsJson){
+				var tempHtml = "<table>";
+				JSON.parse(tempsJson).sensors.forEach( function(tempRecord){
+					tempHtml += "<tr><td>"+tempRecord.dt+"</td><td>"+tempRecord.round+"</td></tr>";
+				});
+				tempHtml += "</table>";
+				document.getElementById('therm'+thermAddress+'Data').innerHTML = tempHtml;
+
+			});
+		}
+
 		function getBoardDetails(boardId){
 			httpGet('/devices/'+boardId, function(boardText){
 				var boardJson = JSON.parse(boardText);
@@ -41,6 +76,8 @@
 				document.getElementById('cmdBoard'+boardId+'Details').setAttribute('onclick',"hideBoardDetails('"+boardId+"')");
 			});
 		}
+
+		
 
 		function hideBoardDetails(boardId){
 			document.getElementById('board'+boardId+'Details').innerHTML = "";
@@ -69,12 +106,15 @@
 		}
 	</script>
 </head>
-<body onload="getBoards()">
+<body onload="loadSystem()">
 	<h1>ninkasi</h1>
-	<div>
+	<div class='devicePanel'>
 		<h2>Devices</h2>
-		<div id='devices'>
-		</div>
+		<div id='devices'></div>
 	</div>
+	<div class='thermometerPanel'>
+		<h2>Thermometers</h2>
+		<div id='thermometers'></div>
+	<div>
 </body>
 </html>

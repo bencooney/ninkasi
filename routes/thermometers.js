@@ -40,7 +40,7 @@ router.get('/:address', function(req, res) {
 router.get('/:address/track', function(req, res) {
 	//list minute averages
 	
-	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD.HH:MI') as dt ,ROUND(CAST(AVG(value) AS NUMERIC),2) FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
+	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD HH:MI') || ':00' as dt ,ROUND(CAST(AVG(value) AS NUMERIC),2) FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
 		.then(function(data){
 			res.send(JSON.stringify({ sensors: data}))
 		})
@@ -53,7 +53,7 @@ router.get('/:address/track', function(req, res) {
 router.get('/:address/track/hourly', function(req, res) {
 	//list hourly averages
 	
-	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD.HH') as dt ,ROUND(CAST(AVG(value) AS NUMERIC) ,2) FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
+	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD HH') || ':00:00' as dt ,ROUND(CAST(AVG(value) AS NUMERIC) ,2) FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
 		.then(function(data){
 			res.send(JSON.stringify({ sensors: data}))
 		})

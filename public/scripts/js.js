@@ -16,7 +16,7 @@ function ledToggle(board, state) {
     	if(state){
     		mode = 'on'
     	}
-		httpPut('/devices/'+board+'/led/'+mode, function(){});
+	httpPut('/devices/'+board+'/led/'+mode, function(){});
 }
 
 function loadSystem(){
@@ -62,12 +62,14 @@ function showThermStats(thermAddress, freq){
 		path += freq; 
 	}
 	httpGet(path, function(tempsJson){
-		var tempHtml = "<table>";
+		var tempHtml = "<div id='graphdiv"+thermAddress+freq+"'></div>";
+		var graphData = "Date,Temperature\n";
 		JSON.parse(tempsJson).sensors.forEach( function(tempRecord){
-			tempHtml += "<tr><td>"+tempRecord.dt+"</td><td>"+tempRecord.round+"</td></tr>";
+			graphData += tempRecord.dt + "," + tempRecord.round + "\n";
 		});
-		tempHtml += "</table>";
 		document.getElementById('therm'+thermAddress+'Data').innerHTML = tempHtml;
+		g = new Dygraph(document.getElementById('graphdiv'+thermAddress+freq),graphData);
+		
 
 	});
 }

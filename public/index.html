@@ -4,14 +4,36 @@
 	<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
 </head>
 <body onload="loadSystem()">
-	<h1>ninkasi</h1>
-	<div class='devicePanel'>
-		<h2>Devices</h2>
-		<div id='devices'></div>
+<div class='all'>
+	<div class='mainTitle'>
+		<div class='mainTitle-title'><h1>ninkasi</h1></div>
+		<div class='mainTitle-dialog'>
+			<p>Automatical Beering with Computery Things by <a href='https://github.com/bencooney'>tehRangiBen</a>.</p>
+			<button>test-button</button> <a>link</a>
+		</div>		
 	</div>
-	<div class='thermometerPanel'>
-		<h2>Thermometers</h2>
-		<div id='thermometers'></div>
-	<div>
+
+	<div class='controls'>
+		<a>sample</a> // <a>lorum</a> // <a>gipsum</a> // <a>plumbum a forest</a> // <a>lorum</a>
+		 // <a>potato</a>
+	</div>	
+
+	<div class='content'>
+		<div class='panel'>
+			<h2 class='panelTitle'>Devices</h2>
+			<button class='showHidePanel' id='showHide-devices' onclick="panelShowHide('devices')">/\</button>
+			<div class='panelContent' id='panel-devices'></div>
+		</div>
+		<div class='panel'>
+			<h2 class='panelTitle'>Thermometers</h2>
+			<button class='showHidePanel' id='showHide-thermometers' onclick="panelShowHide('thermometers')">/\</button>
+			<div class='panelContent' id='panel-thermometers'></div>
+		<div>
+	</div>
+	<div class='emptyFooterSpace'></div>
+</div>
+<div class='footer'>
+	<p>&copy; 2017 tehRangiBen | Rangi Ahi Technology Ltd. | MIT License
+</div>
 </body>
 </html>

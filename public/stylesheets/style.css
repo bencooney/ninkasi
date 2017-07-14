@@ -1,8 +1,99 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;	
+	background-color: #000000;
+	color: #ffffff;
 }
 
 a {
-  color: #00B7FF;
+	color: #00B7FF;
+}
+
+button {
+	border: 0px;
+	background-color: #333333;
+	color: #c9c9c9;	
+}
+
+div.all {
+	padding: 10px;
+	position: relative;
+}
+
+div.mainTitle{
+	border-top: 1px dashed #efefef;
+	border-left: 1px dashed #efefef;
+	
+	float: left;	
+	padding: 20px;
+}
+
+div.mainTitle-title {
+	width: 200px;
+	float:left;
+}
+
+h1 {
+	width: 200px;
+	font-size: 2.5em;
+	border-bottom: 1px solid #efefef;
+	border-right: 1px solid #efefef;
+
+}
+
+div.mainTitle-dialog {
+	float: left;
+	padding-left: 10px;
+	color: green;
+}
+
+div.controls {
+	border-top: 1px dashed #efefef;
+	border-right: 1px dashed #efefef;
+	clear: both;
+	padding: 15px;
+}
+
+
+
+div.content{
+	border-top: 1px dashed #efefef;
+	border-left: 1px dashed #efefef;
+	padding: 10px;
+	padding-bottom: 50px;
+	position: relative;
+}
+
+
+
+div.panel {
+	float:left;
+	padding: 10px;
+	margin: 20px;
+}
+
+h2.panelTitle{
+	float:left;
+}
+button.showHidePanel {
+	float:right;
+}
+div.panelContent{
+	clear: both;
+}
+
+div.emptyFooterSpace {
+	height: 35px;
+}
+
+div.footer {
+	position: fixed;
+	bottom:0;
+	background-color: #000;
+	opacity: 0.75; 
+	width: 100%;
+	text-align: center;
+}
+
+div.footer:hover {
+	display: none;
 }

@@ -65,7 +65,7 @@ function showThermStats(thermAddress, freq){
 		var tempHtml = "<div id='graphdiv"+thermAddress+freq+"'></div>";
 		var graphData = "Date,Temperature\n";
 		JSON.parse(tempsJson).sensors.forEach( function(tempRecord){
-			graphData += tempRecord.dt + "," + tempRecord.round + "\n";
+			graphData += tempRecord.datetime + "," + tempRecord.temperature + "\n";
 		});
 		document.getElementById('therm'+thermAddress+'Data').innerHTML = tempHtml;
 		g = new Dygraph(document.getElementById('graphdiv'+thermAddress+freq),graphData);

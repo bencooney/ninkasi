@@ -8,13 +8,17 @@ var bodyParser = require('body-parser');
 var pgp = require('pg-promise')(/*options*/)
 var db = pgp('postgres://ninkasi:ninkasi@127.0.0.1/ninkasi')
 
-db.one(`CREATE TABLE IF NOT EXISTS temperatures(
+db.none(`CREATE TABLE IF NOT EXISTS temperatures(
 					dt TIMESTAMP DEFAULT NOW(),
 					address VARCHAR(64),
 					value REAL 
-				);`)
+				);`);
 
-
+db.none(`CREATE TABLE IF NOT EXISTS sensor_names(
+		sensorId VARCHAR(64),
+		startDate TIMESTAMP DEFAULT NOW(),
+		name VARCHAR(255)		
+	);`);
 
 
 
@@ -102,12 +106,11 @@ function initThermometer(db, johnnyFive, boardId, addressCode){
 		,address: addressCode
 	})
 
-	thermometer.on('error', function(){
+/*	thermometer.on('error', function(){
 		console.log("E$@!$!@Error found: ");
 	});
-
+*/
 	thermometer.on("change", function(){
-		this.on("error",function(){"2321321error occurred"});
 		if(this.celsius>4000 || this.celsius==85){
 			console.log("Bad Reading!!");
 		} else {

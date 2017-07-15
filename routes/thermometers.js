@@ -25,7 +25,7 @@ router.get('/', function(req, res, next) {
 router.get('/:address', function(req, res) {
 	//list most recent values for that sensor
 	
-	db.one("SELECT dt, value FROM temperatures WHERE address=$1 AND dt=(SELECT MAX(dt) from temperatures WHERE address=$1);", req.params.address)
+	db.one("SELECT dt as datetime, value as temperature FROM temperatures WHERE address=$1 AND dt=(SELECT MAX(dt) from temperatures WHERE address=$1);", req.params.address)
 		.then(function(data){
 			res.send(JSON.stringify({ sensors: data}))
 		})
@@ -40,7 +40,7 @@ router.get('/:address', function(req, res) {
 router.get('/:address/track', function(req, res) {
 	//list minute averages
 	
-	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD HH:MI') || ':00' as dt ,ROUND(CAST(AVG(value) AS NUMERIC),2) FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
+	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD HH24:MI') || ':00' as datetime ,ROUND(CAST(AVG(value) AS NUMERIC),2) as temperature FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
 		.then(function(data){
 			res.send(JSON.stringify({ sensors: data}))
 		})
@@ -53,7 +53,7 @@ router.get('/:address/track', function(req, res) {
 router.get('/:address/track/hourly', function(req, res) {
 	//list hourly averages
 	
-	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD HH') || ':00:00' as dt ,ROUND(CAST(AVG(value) AS NUMERIC) ,2) FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
+	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD HH24') || ':00:00' as datetime ,ROUND(CAST(AVG(value) AS NUMERIC) ,2) as temperature FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
 		.then(function(data){
 			res.send(JSON.stringify({ sensors: data}))
 		})
@@ -66,7 +66,7 @@ router.get('/:address/track/hourly', function(req, res) {
 router.get('/:address/track/daily', function(req, res) {
 	//list daily averages
 	
-	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD') as dt ,ROUND(CAST(AVG(value) AS NUMERIC),2) FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
+	db.many("SELECT TO_CHAR(dt, 'YYYY-MM-DD') as datetime ,ROUND(CAST(AVG(value) AS NUMERIC),2) as temperature FROM temperatures WHERE address = $1 GROUP BY 1 ORDER BY 1;", req.params.address)
 		.then(function(data){
 			res.send(JSON.stringify({ sensors: data}))
 		})

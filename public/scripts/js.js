@@ -54,7 +54,23 @@ function loadSystem(){
 		});
 		document.getElementById('panel-devices').innerHTML = listHtml;
 	});
+
+	httpGet('/beers/', function(beersJson){
+		var beersHtml = "";
+		
+		JSON.parse(beersJson).beers.forEach( function(beer){
+			beersHtml += "<div><ul>" +
+				"  <li><a>" + beer.name + "</a></li>" +
+				"</ul></div>";
+		});
+		document.getElementById('panel-beerLibrary').innerHTML = beersHtml;
+	});
 }
+
+
+
+
+
 
 function showThermStats(thermAddress, freq){
 	var path = "/thermometers/" + thermAddress + "/track/"; 

@@ -16,7 +16,7 @@
 	</div>
 
 	<div class='controls'>
-		 <a>main dashboard</a> // <a>make a beer</a> // <a>update a beer</a> // <a>get beer details</a> 
+		 Views: <a>main dashboard</a> // <a>make a beer</a> // <a>beer library</a> 
 	</div>	
 
 	<div class='content'>
@@ -25,11 +25,20 @@
 			<button class='showHidePanel' id='showHide-devices' onclick="panelShowHide('devices')">/\</button>
 			<div class='panelContent' id='panel-devices'></div>
 		</div>
+
 		<div class='panel'>
 			<h2 class='panelTitle'>Thermometers</h2>
 			<button class='showHidePanel' id='showHide-thermometers' onclick="panelShowHide('thermometers')">/\</button>
 			<div class='panelContent' id='panel-thermometers'></div>
-		<div>
+		</div>
+
+		<div class='panel'>
+			<h2 class='panelTitle'>Beer Libary</h2>
+			<button title='Add Beer'>+</button>
+			<button class='showHidePanel' id='showHide-beerLibrary' onclick="panelShowHide('beerLibrary')">/\</button>
+			<div class='panelContent' id='panel-beerLibrary'></div>
+		</div>
+
 	</div>
 	<div class='emptyFooterSpace'></div>
 </div>

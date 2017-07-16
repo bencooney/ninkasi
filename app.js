@@ -20,11 +20,18 @@ db.none(`CREATE TABLE IF NOT EXISTS sensor_names(
 		name VARCHAR(255)		
 	);`);
 
+db.none(`CREATE TABLE IF NOT EXISTS beers(
+		beerId BIGSERIAL PRIMARY KEY,
+		name VARCHAR(255),
+		brewdate TIMESTAMP DEFAULT NOW()
+	);`);
+
 
 
 var index = require('./routes/index');
 var devices = require('./routes/devices');
 var thermometers = require('./routes/thermometers');
+var beers = require('./routes/beers');
 
 
 //setup arduino devices to control
@@ -71,6 +78,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/devices', devices);
 app.use('/thermometers', thermometers);
+app.use('/beers', beers);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -106,10 +114,6 @@ function initThermometer(db, johnnyFive, boardId, addressCode){
 		,address: addressCode
 	})
 
-/*	thermometer.on('error', function(){
-		console.log("E$@!$!@Error found: ");
-	});
-*/
 	thermometer.on("change", function(){
 		if(this.celsius>4000 || this.celsius==85){
 			console.log("Bad Reading!!");

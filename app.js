@@ -26,7 +26,13 @@ db.none(`CREATE TABLE IF NOT EXISTS beers(
 		brewdate TIMESTAMP DEFAULT NOW()
 	);`);
 
-
+db.none(`CREATE TABLE IF NOT EXISTS beer_events(
+		eventTime TIMESTAMP DEFAULT NOW(),
+		beerId INT, 
+		eventCode VARCHAR(255), 
+		relationID VARCHAR(255), 
+		text TEXT
+	);`);
 
 var index = require('./routes/index');
 var devices = require('./routes/devices');

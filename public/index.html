@@ -1,7 +1,8 @@
 <html>
 <head>
-	<script type="text/javascript" src="/scripts/js.js"></script>
-	<script type="text/javascript" src="/scripts/dygraph.js"></script>
+	<!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" -->
+	<script src="/scripts/js.js"></script>
+	<script src="/scripts/dygraph.js"></script>
 	<link rel="stylesheet" type="text/css" href="stylesheets/dygraph.css">
 	<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
 </head>
@@ -16,10 +17,22 @@
 	</div>
 
 	<div class='controls'>
-		 Views: <a>main dashboard</a> // <a>make a beer</a> // <a>beer library</a> 
+		 Views: <a>main dashboard</a> // <a>brew a beer</a> // <a>beer library</a> 
 	</div>	
 
 	<div class='content'>
+		<div class='panel'>
+			<h2 class='panelTitle'>Beer Libary</h2>
+			<button title='Add Beer' onclick="displayAddBeer()">+</button>
+			<button class='showHidePanel' id='showHide-beerLibrary' onclick="panelShowHide('beerLibrary')">/\</button>
+			<div class='panelContent' id='panel-beerLibrary'></div>
+		</div>
+		
+		<div class='panel'>
+			<div id='dynamicPanel'></div>
+			<!-- dynamic main command panel -->
+		</div>
+
 		<div class='panel'>
 			<h2 class='panelTitle'>Devices</h2>
 			<button class='showHidePanel' id='showHide-devices' onclick="panelShowHide('devices')">/\</button>
@@ -32,15 +45,8 @@
 			<div class='panelContent' id='panel-thermometers'></div>
 		</div>
 
-		<div class='panel'>
-			<h2 class='panelTitle'>Beer Libary</h2>
-			<button title='Add Beer'>+</button>
-			<button class='showHidePanel' id='showHide-beerLibrary' onclick="panelShowHide('beerLibrary')">/\</button>
-			<div class='panelContent' id='panel-beerLibrary'></div>
-		</div>
-
 	</div>
-	<div class='emptyFooterSpace'></div>
+	<div class='emptyFooterSpace'> </div>
 </div>
 <div class='footer'>
 	<p>&copy; 2017 tehRangiBen | Rangi Ahi Technology Ltd. | MIT License

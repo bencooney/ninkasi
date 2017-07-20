@@ -16,7 +16,7 @@ function ledToggle(board, state) {
     	if(state){
     		mode = 'on'
     	}
-	httpPut('/devices/'+board+'/led/'+mode, function(){});
+	httpPut('/devices/'+board+'/led/'+mode, null, function(){});
 }
 
 function loadSystem(){
@@ -55,6 +55,12 @@ function loadSystem(){
 		document.getElementById('panel-devices').innerHTML = listHtml;
 	});
 
+	loadBeersList();
+
+}
+
+function loadBeersList(){
+
 	httpGet('/beers/', function(beersJson){
 		var beersHtml = "";
 		
@@ -67,10 +73,45 @@ function loadSystem(){
 	});
 }
 
+function displayAddBeer(){
+	var addBeerForm = `
+		<h3>Add a new beer to database</h3>
+		Name <input id='addBeer-beerName' type='text' /><br />
+		Brewed on <input id='addBeer-brewDate' type='date' /><br />		
+		<button onclick='processAddBeer()'>Add</button>
+		<div id='addBeer-errorMessage' class='errorMessage'></div>
+		
+	`;	
+	document.getElementById('dynamicPanel').innerHTML = addBeerForm;
 
 
+}	
 
 
+function processAddBeer(){
+	var beerName = document.getElementById('addBeer-beerName').value;
+	var brewDate = document.getElementById('addBeer-brewDate').value;
+
+	if(beerName === ""){
+		document.getElementById('addBeer-errorMessage').innerHTML = "ERROR: Name is Mandatory";
+		return;
+	}
+
+	if(brewDate === ""){
+		httpPost('/beers/', {"beerName": beerName}, resetAddBeerForm());	
+	}else{
+		httpPost('/beers/', {"beerName": beerName, "brewDate":brewDate}, resetAddBeerForm());	
+	}
+
+
+}
+
+function resetAddBeerForm(){
+	document.getElementById('addBeer-beerName').value = "";
+	document.getElementById('addBeer-brewDate').value = "";
+	document.getElementById('addBeer-errorMessage').innerHTML = "";
+	loadBeersList();
+}
 
 function showThermStats(thermAddress, freq){
 	var path = "/thermometers/" + thermAddress + "/track/"; 
@@ -122,12 +163,24 @@ function httpGet(targetUrl, callback) {
 	xmlHttp.send(null);
 }
 
-function httpPut(targetUrl, callback) {
+function httpPut(targetUrl, body, callback) {
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function() { 
-	if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-		callback(xmlHttp.responseText);
+		if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+			callback(xmlHttp.responseText);
 	}
 	xmlHttp.open("PUT", targetUrl, true); // true for asynchronous 
-	xmlHttp.send(null);
+	xmlHttp.setRequestHeader("Content-Type", "application/json");
+	xmlHttp.send(JSON.stringify(body));
+}
+
+function httpPost(targetUrl, body, callback) {
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onreadystatechange = function() {
+		if(xmlHttp.readyState == 4 && (xmlHttp.status == 201 || xmlHttp.status == 200))
+			callback(xmlHttp.responseText);
+	}
+	xmlHttp.open("POST", targetUrl, true);
+	xmlHttp.setRequestHeader("Content-Type", "application/json");
+	xmlHttp.send(JSON.stringify(body));
 }

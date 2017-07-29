@@ -62,15 +62,43 @@ function loadSystem(){
 function loadBeersList(){
 
 	httpGet('/beers/', function(beersJson){
-		var beersHtml = "";
+		var beersHtml = `<div>
+			<div>
+				Beers | <button onclick='loadEventConfigsList()'>Events</button>
+			</div>
+			<button onclick='displayAddBeer()'>+</button>
+			<ul>
+		`;
 		
 		JSON.parse(beersJson).beers.forEach( function(beer){
-			beersHtml += "<div><ul>" +
-				"  <li><a>" + beer.name + "</a></li>" +
-				"</ul></div>";
+			beersHtml += "<li><button onclick='displayBeer(\""+ beer.beerid+"\")'>" + beer.name + "</button></li>";
 		});
-		document.getElementById('panel-beerLibrary').innerHTML = beersHtml;
+		beersHtml += "</ul></div>";
+		document.getElementById('panel-library').innerHTML = beersHtml;
 	});
+}
+
+function loadEventConfigsList(){
+	
+	httpGet('/events/', function(eventsJson){
+		var eventsHtml = `<div>
+			<div>
+				<button onclick='loadBeersList()'>Beers</button> | Events
+			</div>
+			<button onclick='displayAddEventConfig()'>+</button>
+			<ul>
+		`;
+		
+		JSON.parse(eventsJson).events.forEach( function(event){
+			eventsHtml += "<li><button onclick='displayEventConfig(\""+ event.eventcode+"\")'>" + event.eventCode + "</button></li>";
+		});
+		eventsHtml += "</ul></div>";
+		document.getElementById('panel-library').innerHTML = eventsHtml;
+	});
+}
+
+function setDynamicPanel(htmlContent){
+	document.getElementById('dynamicPanel').innerHTML = htmlContent;
 }
 
 function displayAddBeer(){
@@ -82,11 +110,66 @@ function displayAddBeer(){
 		<div id='addBeer-errorMessage' class='errorMessage'></div>
 		
 	`;	
-	document.getElementById('dynamicPanel').innerHTML = addBeerForm;
-
-
+	setDynamicPanel(addBeerForm);
 }	
 
+
+function displayAddEventConfig(){
+	var addForm = `
+		<h3>Add a new event configuration to database</h3>
+		EventCode <input id='addEvent-eventCode' type='text' /><br />
+		Json for event configuration <input id='addEvent-standarddata' type='text' /><br />		
+		<button onclick='processAddEventConfig()'>Add</button>
+		<div id='addEvent-errorMessage' class='errorMessage'></div>
+		
+	`;	
+	setDynamicPanel(addForm);
+}	
+
+
+function displayBeer(beerId){
+
+
+	httpGet('/beers/' + beerId, function(beerJson){
+		var beerDetails = "<div><h3>";
+
+		var data = JSON.parse(beerJson);
+
+		var brewDate = new Date(data.beer.brewdate);
+		
+		beerDetails += data.beer.name + "</h3>";
+		beerDetails += "Created: " + getIsoDate(brewDate) + "<br />";
+		beerDetails += "<button onclick=\"showDeleteBeer('"+data.beer.beerid+"')\">delete</button>";
+
+		beerDetails += "<ul>";
+		data.events.forEach( function(event){
+			beerDetails += "<li>" + event.eventtime + " - " + event.eventcode + " - " + event.data.name +"</li>";
+		});
+		beerDetails += "</ul></div>";
+		setDynamicPanel(beerDetails);
+	});
+}
+
+function showDeleteBeer(beerId){
+	form = `<div class='confirmDialog'>
+			Are you sure you want to delete this beer and all associated events? It cannot be undone.
+			<br />
+			<button onclick="deleteBeer(`+beerId+`)">YES</button> <button onclick="cancel()">NO</button>
+		</div>
+	`;
+	setDynamicPanel(form);
+}
+
+function deleteBeer(beerId){
+	httpPut('/beers/', {'delete':beerId}, function(){
+		setDynamicPanel('');
+		loadBeersList();
+	});
+}
+
+function cancel(){
+	setDynamicPanel('');
+}
 
 function processAddBeer(){
 	var beerName = document.getElementById('addBeer-beerName').value;
@@ -102,8 +185,6 @@ function processAddBeer(){
 	}else{
 		httpPost('/beers/', {"beerName": beerName, "brewDate":brewDate}, resetAddBeerForm());	
 	}
-
-
 }
 
 function resetAddBeerForm(){
@@ -183,4 +264,19 @@ function httpPost(targetUrl, body, callback) {
 	xmlHttp.open("POST", targetUrl, true);
 	xmlHttp.setRequestHeader("Content-Type", "application/json");
 	xmlHttp.send(JSON.stringify(body));
+}
+
+function httpDelete(targetUrl, body, callback) {
+	var xmlHttp = new XMLHttpRequest();
+	xmlHttp.onreadystatechange = function() { 
+		if (xmlHttp.readyState == 4 && (xmlHttp.status == 200 || xmlHttp.status == 204))
+			callback(xmlHttp.responseText);
+	}
+	xmlHttp.open("DELETE", targetUrl, true); // true for asynchronous 
+	xmlHttp.setRequestHeader("Content-Type", "application/json");
+	xmlHttp.send(JSON.stringify(body));
+}
+
+function getIsoDate(date){
+	return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
 }

@@ -8,37 +8,13 @@ var bodyParser = require('body-parser');
 var pgp = require('pg-promise')(/*options*/)
 var db = pgp('postgres://ninkasi:ninkasi@127.0.0.1/ninkasi')
 
-db.none(`CREATE TABLE IF NOT EXISTS temperatures(
-					dt TIMESTAMP DEFAULT NOW(),
-					address VARCHAR(64),
-					value REAL 
-				);`);
-
-db.none(`CREATE TABLE IF NOT EXISTS sensor_names(
-		sensorId VARCHAR(64),
-		startDate TIMESTAMP DEFAULT NOW(),
-		name VARCHAR(255)		
-	);`);
-
-db.none(`CREATE TABLE IF NOT EXISTS beers(
-		beerId BIGSERIAL PRIMARY KEY,
-		name VARCHAR(255),
-		brewdate TIMESTAMP DEFAULT NOW()
-	);`);
-
-db.none(`CREATE TABLE IF NOT EXISTS beer_events(
-		eventTime TIMESTAMP DEFAULT NOW(),
-		beerId INT, 
-		eventCode VARCHAR(255), 
-		relationID VARCHAR(255), 
-		text TEXT
-	);`);
+setupDatabase(db);
 
 var index = require('./routes/index');
 var devices = require('./routes/devices');
 var thermometers = require('./routes/thermometers');
 var beers = require('./routes/beers');
-
+var events = require('./routes/events');
 
 //setup arduino devices to control
 var johnnyFive = require("johnny-five");
@@ -85,6 +61,7 @@ app.use('/', index);
 app.use('/devices', devices);
 app.use('/thermometers', thermometers);
 app.use('/beers', beers);
+app.use('/events', events);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -134,5 +111,40 @@ function initThermometer(db, johnnyFive, boardId, addressCode){
 	});
 
 	console.log("initialised Thermometer Sensor: " + thermometer.address.toString(16));
+
+}
+
+function setupDatabase(dbase){
+	
+	dbase.none(`CREATE TABLE IF NOT EXISTS temperatures(
+						dt TIMESTAMP DEFAULT NOW(),
+						address VARCHAR(64),
+						value REAL 
+					);`);
+	
+	dbase.none(`CREATE TABLE IF NOT EXISTS sensor_names(
+			sensorId VARCHAR(64),
+			startDate TIMESTAMP DEFAULT NOW(),
+			name VARCHAR(255)		
+		);`);
+	
+	dbase.none(`CREATE TABLE IF NOT EXISTS beers(
+			beerId BIGSERIAL PRIMARY KEY,
+			name VARCHAR(255),
+			brewdate TIMESTAMP DEFAULT NOW()
+		);`);
+	
+	dbase.none(`CREATE TABLE IF NOT EXISTS beer_events(
+			eventTime TIMESTAMP DEFAULT NOW(),
+			beerId integer REFERENCES beers ON CASCADE DELETE, 
+			eventCode VARCHAR(255), 
+			relationID VARCHAR(255), 
+			data jsonb
+		);`);
+	
+	dbase.none(`CREATE TABLE IF NOT EXISTS events_lookup(
+			eventcode VARCHAR(255), 
+			standarddata jsonb
+		);`);
 
 }

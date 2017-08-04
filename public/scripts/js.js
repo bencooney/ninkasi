@@ -1,6 +1,5 @@
-
-import('deviceControlFunctions.js');
-import('genericHelperFunctions.js');
+include('deviceControlFunctions.js');
+include('genericHelperFunctions.js');
 
 function loadSystem(){
 	loadThermometersList();

@@ -1,9 +1,5 @@
 
 function loadSystem(){
-//	loadThermometersList();
-
-//	loadDevicesList();
-
 	loadBeersList();
 }
 
@@ -20,47 +16,6 @@ function panelShowHide(panel) {
 		panelElement.style.visibility = 'hidden';
 		buttonElement.innerHTML = "\\/";
 	}
-}
-
-
-
-function loadDevicesList(){
-
-	httpGet('/devices/', function(devicesJson){
-		var listHtml = "";
-		JSON.parse(devicesJson).devices.forEach( function(obj){
-			listHtml += "<div>" +
-				"  <h3>Device: "+ obj +"</h3>" +
-				"  <p>LED"+
-				"    <button onclick=\"ledToggle('"+obj+"',true)\">On</button>" +
-				"    <button onclick=\"ledToggle('"+obj+"',false)\">Off</button>" +
-				"    <button id='cmdBoard"+obj+"Details' onclick=\"getBoardDetails('"+obj+"')\">\\/</button>" +
-				"    <div id='board"+obj+"Details'></div>"
-				"  </p>" +
-				"</div>";
-		});
-		document.getElementById('panel-library').innerHTML = listHtml;
-	});
-}
-
-function loadThermometersList(){
-
-	httpGet('/thermometers/', function(thermsJson){
-		var thermsHtml = "";
-		
-		JSON.parse(thermsJson).sensors.forEach( function(therm){
-			thermsHtml += "<div>" +
-				"  <h3>Therm: " + therm.address + "</h3>" +
-				"  <div class='therm-info-buttons'>" +
-				"    <button onclick=\"showThermStats('"+therm.address+"')\">Minutely</button>" +
-				"    <button onclick=\"showThermStats('"+therm.address+"','hourly')\">Hourly</button>" +
-				"    <button onclick=\"showThermStats('"+therm.address+"','daily')\">Daily</button>" +
-				"    <div id=\"therm"+therm.address+"Data\"></div>" +	
-				"  </div>" + 
-				"</div>";
-		});
-		document.getElementById('panel-library').innerHTML = thermsHtml;
-	});
 }
 
 function getLibraryLinks(thisLibraryId){
@@ -90,45 +45,88 @@ function getLibraryLinks(thisLibraryId){
 	return returnStr;
 }
 
-function loadBeersList(){
 
-	httpGet('/beers/', function(beersJson){
-		var beersHtml = `<div>
-			`+getLibraryLinks('beers')+`
-			<button onclick='displayAddBeer()'>+</button>
-			<ul>
-		`;
-		
-		JSON.parse(beersJson).beers.forEach( function(beer){
-			beersHtml += "<li><button onclick='displayBeer(\""+ beer.beerid+"\")'>" + beer.name + "</button></li>";
+function loadDevicesList(){
+	httpGet('/devices/', function(devicesJson){
+		var listHtml = "";
+		JSON.parse(devicesJson).devices.forEach( function(obj){
+			listHtml += "<div>" +
+				"  <h3>Device: "+ obj +"</h3>" +
+				"  <p>LED"+
+				"    <button onclick=\"ledToggle('"+obj+"',true)\">On</button>" +
+				"    <button onclick=\"ledToggle('"+obj+"',false)\">Off</button>" +
+				"    <button id='cmdBoard"+obj+"Details' onclick=\"getBoardDetails('"+obj+"')\">\\/</button>" +
+				"    <div id='board"+obj+"Details'></div>"
+				"  </p>" +
+				"</div>";
 		});
-		beersHtml += "</ul></div>";
-		document.getElementById('panel-library').innerHTML = beersHtml;
+
+		setLibraryPanel('devices',listHtml);
 	});
 }
 
-function loadEventConfigsList(){
-	
-	httpGet('/events/', function(eventsJson){
-		var eventsHtml = `<div>
-			<div>
-				<button onclick='loadBeersList()'>Beers</button> | Events
-			</div>
-			<button onclick='displayAddEventConfig()'>+</button>
-			<ul>
-		`;
+function loadThermometersList(){
+	httpGet('/thermometers/', function(thermsJson){
+		var thermsHtml = "";
 		
+		JSON.parse(thermsJson).sensors.forEach( function(therm){
+			thermsHtml += "<div>" +
+				"  <h3>Therm: " + therm.address + "</h3>" +
+				"  <div class='therm-info-buttons'>" +
+				"    <button onclick=\"showThermStats('"+therm.address+"')\">Minutely</button>" +
+				"    <button onclick=\"showThermStats('"+therm.address+"','hourly')\">Hourly</button>" +
+				"    <button onclick=\"showThermStats('"+therm.address+"','daily')\">Daily</button>" +
+				"    <div id=\"therm"+therm.address+"Data\"></div>" +	
+				"  </div>" + 
+				"</div>";
+		});
+
+		setLibraryPanel('thermometers', thermsHtml);
+	});
+}
+
+
+function loadBeersList(){
+	httpGet('/beers/', function(beersJson){
+		var beersHtml = "<button onclick='displayAddBeer()'>+</button>";
+		beersHtml += "<ul>";		
+		JSON.parse(beersJson).beers.forEach( function(beer){
+			beersHtml += "<li><button onclick='displayBeer(\""+ beer.beerid+"\")'>" + beer.name + "</button></li>";
+		});
+		beersHtml += "</ul>";
+
+		setLibraryPanel('beers',beersHtml);
+	});
+}
+
+function loadEventConfigsList(){	
+	httpGet('/events/', function(eventsJson){
+		var eventsHtml = "<button onclick='displayAddEventConfig()'>+</button>";
+		eventsHtml += "<ul>";
 		JSON.parse(eventsJson).events.forEach( function(event){
 			eventsHtml += "<li><button onclick='displayEditEventConfig(\""+ event.eventcode+"\")'>" + event.eventcode + "</button></li>";
 		});
-		eventsHtml += "</ul></div>";
-		document.getElementById('panel-library').innerHTML = eventsHtml;
+		eventsHtml += "</ul>";
+
+		setLibraryPanel('events', eventsHtml);
 	});
+}
+
+function setLibraryPanel(libraryName, htmlContent){
+	content = "<div>"+getLibraryLinks(libraryName)+htmlContent+"</div>";
+	document.getElementById('panel-library').innerHTML = content;
 }
 
 function setDynamicPanel(htmlContent){
 	document.getElementById('dynamicPanel').innerHTML = htmlContent;
 }
+
+function clearDynamicPanel(){
+	setDynamicPanel('');
+}
+
+
+
 
 function displayAddBeer(){
 	var addBeerForm = `
@@ -195,7 +193,8 @@ function showDeleteBeer(beerId){
 	form = `<div class='confirmDialog'>
 			Are you sure you want to delete this beer and all associated events? It cannot be undone.
 			<br />
-			<button onclick="processDeleteBeer(`+beerId+`)">YES</button> <button onclick="cancelDynamicPanelCommand()">NO</button>
+			<button onclick="processDeleteBeer(`+beerId+`)">YES</button>
+			<button onclick="clearDynamicPanel()">NO</button>
 		</div>
 	`;
 	setDynamicPanel(form);
@@ -208,9 +207,6 @@ function processDeleteBeer(beerId){
 	});
 }
 
-function cancelDynamicPanelCommand(){
-	setDynamicPanel('');
-}
 
 
 function processAddEventConfig(){
@@ -254,6 +250,12 @@ function resetAddBeerForm(){
 	loadBeersList();
 }
 
+
+
+
+
+
+
 function showThermStats(thermAddress, freq){
 	var path = "/thermometers/" + thermAddress + "/track/"; 
 	if(freq){
@@ -265,7 +267,8 @@ function showThermStats(thermAddress, freq){
 		JSON.parse(tempsJson).sensors.forEach( function(tempRecord){
 			graphData += tempRecord.datetime + "," + tempRecord.temperature + "\n";
 		});
-		document.getElementById('therm'+thermAddress+'Data').innerHTML = tempHtml;
+		
+		setDynamicPanel(tempHtml);
 		g = new Dygraph(document.getElementById('graphdiv'+thermAddress+freq),graphData);
 		
 

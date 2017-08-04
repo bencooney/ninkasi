@@ -188,7 +188,7 @@ function displayBeer(beerId){
 				
 				var i =0;
 				for(var key in event.data){
-					if(['name','amount','amount-unit'].indexOf(key) >= 0){
+					if(['name','amount','amountUnit'].indexOf(key) < 0){
 						if(i > 0)
 							ingredientsHtml += ",";
 						ingredientsHtml += key + ": " + event.data[key];

@@ -50,15 +50,15 @@ router.put('/', function(req, res, next){
 router.post('/', function(req,res,next) {
 	console.log("Adding Event " + req.body.eventCode);
 	console.dir(req.body);
-	if((!req.body.eventCode)||(!req.body.standardData)){
+	if((!req.body.eventCode)||(!req.body.standarddata)){
 		res.send(JSON.stringify({"error":"'eventCode' is required"}));
 		return 0;
 	}
 
-	db.none("INSERT INTO events_lookup(eventcode, standarddata) VALUES($1,$2);",[req.body.eventCode,req.body.standardData])
+	db.none("INSERT INTO events_lookup(eventcode, standarddata) VALUES($1,$2);",[req.body.eventCode,req.body.standarddata])
 		.then(function (){
 			res.status(201);
-			res.send(JSON.stringify({"created":res.body.eventCode}));		
+			res.send(JSON.stringify({"created":req.body.eventCode}));		
 		})
 		.catch(function (errorString){
 			processDbError(errorString);	

@@ -90,7 +90,7 @@ function loadEventConfigsList(){
 		`;
 		
 		JSON.parse(eventsJson).events.forEach( function(event){
-			eventsHtml += "<li><button onclick='displayEventConfig(\""+ event.eventcode+"\")'>" + event.eventCode + "</button></li>";
+			eventsHtml += "<li><button onclick='displayEditEventConfig(\""+ event.eventcode+"\")'>" + event.eventcode + "</button></li>";
 		});
 		eventsHtml += "</ul></div>";
 		document.getElementById('panel-library').innerHTML = eventsHtml;
@@ -113,18 +113,30 @@ function displayAddBeer(){
 	setDynamicPanel(addBeerForm);
 }	
 
+function getEventConfigForm(mode){
+	return `EventCode <input id='eventConfig-eventCode' type='text' /><br />
+		Json for event configuration <br />
+		<textarea id='eventConfig-standardData' type='text' cols='60' rows='10'>\{\}</textarea><br />		
+		<button id='eventConfig-submit' onclick='process`+mode+`EventConfig()'>`+mode+`</button>
+		<div id='eventConfig-errorMessage' class='errorMessage'></div>`;
+}
 
 function displayAddEventConfig(){
-	var addForm = `
-		<h3>Add a new event configuration to database</h3>
-		EventCode <input id='addEvent-eventCode' type='text' /><br />
-		Json for event configuration <input id='addEvent-standarddata' type='text' /><br />		
-		<button onclick='processAddEventConfig()'>Add</button>
-		<div id='addEvent-errorMessage' class='errorMessage'></div>
-		
-	`;	
+	var addForm = "<h3>Add a new event configuration to database</h3>" + getEventConfigForm('Add');	
 	setDynamicPanel(addForm);
+}
+
+function displayEditEventConfig(eventCode){
+	httpGet('/events/'+eventCode, function(eventJson){
+		var event = JSON.parse(eventJson); 
+		var editForm = "<h3>Edit the "+eventCode+" event</h3>" + getEventConfigForm('Edit');
+		setDynamicPanel(editForm);
+		document.getElementById('eventConfig-submit').onclick="processEditEventConfig('"+eventCode+"')"
+		document.getElementById('eventConfig-eventCode').value=event.eventcode;
+		document.getElementById('eventConfig-standardData').value=JSON.stringify(event.standarddata);
+	});
 }	
+
 
 
 function displayBeer(beerId){
@@ -169,6 +181,25 @@ function deleteBeer(beerId){
 
 function cancel(){
 	setDynamicPanel('');
+}
+
+
+function processAddEventConfig(){
+	var eventCodeElement = document.getElementById('eventConfig-eventCode');
+	var standardDataElement = document.getElementById('eventConfig-standardData');
+
+	if((eventCodeElement.value === "")||(standardDataElement.value === "")){
+		document.getElementById('addEventConfig-errorMessage').innerHtml = "ERROR: eventCode and standardData are mandatory";
+		return;
+	}
+	
+	var request = {'eventCode': eventCodeElement.value, 'standarddata': JSON.parse(standardDataElement.value) };
+
+	httpPost('/events/',request,function(){
+		eventCodeElement.value = "";
+		standardDataElement.value = "";
+		loadEventConfigsList();
+	});
 }
 
 function processAddBeer(){

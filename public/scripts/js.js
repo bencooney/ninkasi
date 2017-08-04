@@ -1,8 +1,8 @@
 
 function loadSystem(){
-	loadThermometersList();
+//	loadThermometersList();
 
-	loadDevicesList();
+//	loadDevicesList();
 
 	loadBeersList();
 }
@@ -39,7 +39,7 @@ function loadDevicesList(){
 				"  </p>" +
 				"</div>";
 		});
-		document.getElementById('panel-devices').innerHTML = listHtml;
+		document.getElementById('panel-library').innerHTML = listHtml;
 	});
 }
 
@@ -59,17 +59,42 @@ function loadThermometersList(){
 				"  </div>" + 
 				"</div>";
 		});
-		document.getElementById('panel-thermometers').innerHTML = thermsHtml;
+		document.getElementById('panel-library').innerHTML = thermsHtml;
 	});
+}
+
+getLibraryLinks(thisLibraryId){
+	links = { 
+		'Beers': 'loadBeersList()',
+		'Events': 'loadEventConfigsList()',
+		'Devices': 'loadDevicesList()',
+		'Thermometers': 'loadThermometersList()'
+	};
+
+	returnStr = "<div>";
+	var i = 0;
+	for(var key in links){
+		if(i > 0){
+			returnStr += " | ";
+		}
+
+		if(thisLibraryId.toLowerCase() === key.toLowerCase()){
+			returnStr += key;
+		}else{
+			returnStr += "<button onclick='" + links[key] + "'>"+key+"</button>";
+		}
+		i++;
+	}
+	returnStr += "</div>"
+
+	return returnStr;
 }
 
 function loadBeersList(){
 
 	httpGet('/beers/', function(beersJson){
 		var beersHtml = `<div>
-			<div>
-				Beers | <button onclick='loadEventConfigsList()'>Events</button>
-			</div>
+			`+getLibraryLinks('beers')+`
 			<button onclick='displayAddBeer()'>+</button>
 			<ul>
 		`;

@@ -180,11 +180,37 @@ function displayBeer(beerId){
 		beerDetails += "Created: " + getIsoDate(brewDate) + "<br />";
 		beerDetails += "<button onclick=\"showDeleteBeer('"+data.beer.beerid+"')\">delete</button>";
 
-		beerDetails += "<ul>";
+		var ingredientsHtml = "<ul>";
+		var eventsHtml = "<table>";
+
 		data.events.forEach( function(event){
-			beerDetails += "<li>" + event.eventtime + " - " + event.eventcode + " - " + event.data.name +"</li>";
+			if(event.eventcode==='ingredient'){
+				ingredientsHtml += "<li>" + event.data.name + " - " + event.data.amount + event.data.amount-unit + " (";
+				
+				var i =0;
+				for(var key in event.data){
+					if(['name','amount','amount-unit'].indexOf(key) >= 0){
+						if(i > 0)
+							ingredientsHtml += ",";
+						ingredientsHtml += key + ": " + event.data[key];
+					}
+				}	
+				ingredientsHtml += ")</li>";
+			}else{
+				eventsHtml += `<tr>
+											<td>`+event.eventtime+`</td>
+											<td>`+event.eventcode+`</td>
+											<td>`+event.data.name+`</td>
+										`;
+			}
 		});
-		beerDetails += "</ul></div>";
+
+		ingredientsHtml += "</ul>"
+		eventsHtml += "</table>";
+
+		beerDetails += ingredientsHtml;
+		beerDetails += eventsHtml;
+		beerDetails += "</div>";
 		setDynamicPanel(beerDetails);
 	});
 }

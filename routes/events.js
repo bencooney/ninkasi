@@ -42,7 +42,15 @@ router.put('/', function(req, res, next){
 			});
 
 	}else{
-		res.send(JSON.stringify({'Error': 'not sure what to do'}));
+		db.none("UPDATE events_lookup SET standarddata=$1 WHERE eventcode=$2);",[req.body.standarddata,req.body.eventCode])
+			.then(function (){
+				res.status(200);
+				res.send(JSON.stringify({"updated":req.body.eventCode}));		
+			})
+			.catch(function (errorString){
+				processDbError(errorString);	
+			});
+
 	}
 
 });

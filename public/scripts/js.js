@@ -63,7 +63,7 @@ function loadThermometersList(){
 	});
 }
 
-getLibraryLinks(thisLibraryId){
+function getLibraryLinks(thisLibraryId){
 	links = { 
 		'Beers': 'loadBeersList()',
 		'Events': 'loadEventConfigsList()',

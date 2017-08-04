@@ -1,3 +1,18 @@
+
+import('deviceControlFunctions.js');
+import('genericHelperFunctions.js');
+
+function loadSystem(){
+	loadThermometersList();
+
+	loadDevicesList();
+
+	loadBeersList();
+}
+
+
+
+
 function panelShowHide(panel) {
 	var panelElement = document.getElementById('panel-'+panel);
 	var buttonElement = document.getElementById('showHide-'+panel);
@@ -10,34 +25,9 @@ function panelShowHide(panel) {
 	}
 }
 
-function ledToggle(board, state) {
-    	console.log('sending led='+state+' to board ' + board );
-    	var mode = 'off';
-    	if(state){
-    		mode = 'on'
-    	}
-	httpPut('/devices/'+board+'/led/'+mode, null, function(){});
-}
 
-function loadSystem(){
-	
-	
-	httpGet('/thermometers/', function(thermsJson){
-		var thermsHtml = "";
-		
-		JSON.parse(thermsJson).sensors.forEach( function(therm){
-			thermsHtml += "<div>" +
-				"  <h3>Therm: " + therm.address + "</h3>" +
-				"  <div class='therm-info-buttons'>" +
-				"    <button onclick=\"showThermStats('"+therm.address+"')\">Minutely</button>" +
-				"    <button onclick=\"showThermStats('"+therm.address+"','hourly')\">Hourly</button>" +
-				"    <button onclick=\"showThermStats('"+therm.address+"','daily')\">Daily</button>" +
-				"    <div id=\"therm"+therm.address+"Data\"></div>" +	
-				"  </div>" + 
-				"</div>";
-		});
-		document.getElementById('panel-thermometers').innerHTML = thermsHtml;
-	});
+
+function loadDevicesList(){
 
 	httpGet('/devices/', function(devicesJson){
 		var listHtml = "";
@@ -54,9 +44,26 @@ function loadSystem(){
 		});
 		document.getElementById('panel-devices').innerHTML = listHtml;
 	});
+}
 
-	loadBeersList();
+function loadThermometersList(){
 
+	httpGet('/thermometers/', function(thermsJson){
+		var thermsHtml = "";
+		
+		JSON.parse(thermsJson).sensors.forEach( function(therm){
+			thermsHtml += "<div>" +
+				"  <h3>Therm: " + therm.address + "</h3>" +
+				"  <div class='therm-info-buttons'>" +
+				"    <button onclick=\"showThermStats('"+therm.address+"')\">Minutely</button>" +
+				"    <button onclick=\"showThermStats('"+therm.address+"','hourly')\">Hourly</button>" +
+				"    <button onclick=\"showThermStats('"+therm.address+"','daily')\">Daily</button>" +
+				"    <div id=\"therm"+therm.address+"Data\"></div>" +	
+				"  </div>" + 
+				"</div>";
+		});
+		document.getElementById('panel-thermometers').innerHTML = thermsHtml;
+	});
 }
 
 function loadBeersList(){
@@ -166,20 +173,20 @@ function showDeleteBeer(beerId){
 	form = `<div class='confirmDialog'>
 			Are you sure you want to delete this beer and all associated events? It cannot be undone.
 			<br />
-			<button onclick="deleteBeer(`+beerId+`)">YES</button> <button onclick="cancel()">NO</button>
+			<button onclick="processDeleteBeer(`+beerId+`)">YES</button> <button onclick="cancelDynamicPanelCommand()">NO</button>
 		</div>
 	`;
 	setDynamicPanel(form);
 }
 
-function deleteBeer(beerId){
+function processDeleteBeer(beerId){
 	httpPut('/beers/', {'delete':beerId}, function(){
 		setDynamicPanel('');
 		loadBeersList();
 	});
 }
 
-function cancel(){
+function cancelDynamicPanelCommand(){
 	setDynamicPanel('');
 }
 
@@ -265,49 +272,3 @@ function hideBoardDetails(boardId){
   document.getElementById('cmdBoard'+boardId+'Details').setAttribute('onclick',"getBoardDetails('"+boardId+"')");
 }
 
-function httpGet(targetUrl, callback) {
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function() { 
-	if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-		callback(xmlHttp.responseText);
-	}
-	xmlHttp.open("GET", targetUrl, true); // true for asynchronous 
-	xmlHttp.send(null);
-}
-
-function httpPut(targetUrl, body, callback) {
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function() { 
-		if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-			callback(xmlHttp.responseText);
-	}
-	xmlHttp.open("PUT", targetUrl, true); // true for asynchronous 
-	xmlHttp.setRequestHeader("Content-Type", "application/json");
-	xmlHttp.send(JSON.stringify(body));
-}
-
-function httpPost(targetUrl, body, callback) {
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function() {
-		if(xmlHttp.readyState == 4 && (xmlHttp.status == 201 || xmlHttp.status == 200))
-			callback(xmlHttp.responseText);
-	}
-	xmlHttp.open("POST", targetUrl, true);
-	xmlHttp.setRequestHeader("Content-Type", "application/json");
-	xmlHttp.send(JSON.stringify(body));
-}
-
-function httpDelete(targetUrl, body, callback) {
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.onreadystatechange = function() { 
-		if (xmlHttp.readyState == 4 && (xmlHttp.status == 200 || xmlHttp.status == 204))
-			callback(xmlHttp.responseText);
-	}
-	xmlHttp.open("DELETE", targetUrl, true); // true for asynchronous 
-	xmlHttp.setRequestHeader("Content-Type", "application/json");
-	xmlHttp.send(JSON.stringify(body));
-}
-
-function getIsoDate(date){
-	return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
-}

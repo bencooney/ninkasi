@@ -177,7 +177,12 @@ function displayBeer(beerId){
 		
 		beerDetails += data.beer.name + "</h3>";
 		beerDetails += "Created: " + getIsoDate(brewDate) + "<br />";
-		beerDetails += "<button onclick=\"showDeleteBeer('"+data.beer.beerid+"')\">delete</button>";
+		beerDetails += `
+			<button onclick="showDeleteBeer('`+data.beer.beerid+`')">Delete</button>
+			<button onclick="displayAddEventToBeer()">Add Event</button>
+			<br />
+			<div id="beer-addEvent"></div>
+		`;
 
 		var ingredientsHtml = "<ul>";
 		var eventsHtml = "<table>";
@@ -190,7 +195,7 @@ function displayBeer(beerId){
 				for(var key in event.data){
 					if(['name','amount','amountUnit'].indexOf(key) < 0){
 						if(i > 0)
-							ingredientsHtml += ",";
+							ingredientsHtml += ", ";
 						ingredientsHtml += key + ": " + event.data[key];
 					}
 				}	
@@ -211,6 +216,31 @@ function displayBeer(beerId){
 		beerDetails += eventsHtml;
 		beerDetails += "</div>";
 		setDynamicPanel(beerDetails);
+	});
+}
+
+function displayAddEventToBeer(){
+	httpGet('/events/', function(eventsJson){
+		var html = "<select id='beer-addEvent-eventcode' onchange='displayEventsFields()'>";
+		JSON.parse(eventsJson).events.forEach( function(event){
+			html += "<option>"+ event.eventcode+"</option>";
+		});
+		html += "</select>";
+		html += "<div id='beer-addEvent-fields'></div>"
+
+		document.getElementById('beer-addEvent').innerHTML = html;
+	});
+}
+
+function displayEventsFields(){
+	var eventCode = document.getElementById('beer-addEvent-eventcode').value;
+	httpGet('/events/'+eventCode, function(eventJson){
+		var html = `
+			<textarea>
+				`+JSON.stringify(JSON.parse(eventJson).standarddata) + `
+			</textarea>
+			<button onclick='processAddEventToBeer()'>`;
+		document.getElementById('beer-addEvent-fields').innerHTML = html; 
 	});
 }
 
@@ -239,15 +269,14 @@ function processAddEventConfig(){
 	var standardDataElement = document.getElementById('eventConfig-standardData');
 
 	if((eventCodeElement.value === "")||(standardDataElement.value === "")){
-		document.getElementById('addEventConfig-errorMessage').innerHtml = "ERROR: eventCode and standardData are mandatory";
+		document.getElementById('addEventConfig-errorMessage').innerHTML = "ERROR: eventCode and standardData are mandatory";
 		return;
 	}
 	
 	var request = {'eventCode': eventCodeElement.value, 'standarddata': JSON.parse(standardDataElement.value) };
 
 	httpPost('/events/',request,function(){
-		eventCodeElement.value = "";
-		standardDataElement.value = "";
+		displayEditEventConfig(eventCodeElement.value);
 		loadEventConfigsList();
 	});
 }
@@ -258,7 +287,7 @@ function processEditEventConfig(){
 	var standardDataElement = document.getElementById('eventConfig-standardData');
 
 	if((eventCodeElement.value === "")||(standardDataElement.value === "")){
-		document.getElementById('addEventConfig-errorMessage').innerHtml = "ERROR: eventCode and standardData are mandatory";
+		document.getElementById('addEventConfig-errorMessage').innerHTML = "ERROR: eventCode and standardData are mandatory";
 		return;
 	}
 	

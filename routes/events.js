@@ -17,7 +17,7 @@ function processDbError(dbErrorMessage, res){
 router.get('/', function(req, res, next) {
 	console.log("listing events");
 	
-	db.any(`SELECT eventCode, standarddata FROM events_lookup ORDER BY eventCode DESC;`)
+	db.any(`SELECT eventCode, standarddata, displaystructure FROM events_lookup ORDER BY eventCode DESC;`)
 		.then(function(data){
 			res.send(JSON.stringify({ 'events': data}))
 		})
@@ -42,7 +42,7 @@ router.put('/', function(req, res, next){
 			});
 
 	}else{
-		db.none("UPDATE events_lookup SET standarddata=$1 WHERE eventcode=$2;",[req.body.standarddata,req.body.eventCode])
+		db.none("UPDATE events_lookup SET standarddata=$1 , displaystructure=$2 WHERE eventcode=$3;",[req.body.standarddata,req.body.displaystructure,req.body.eventCode])
 			.then(function (){
 				res.status(200);
 				res.send(JSON.stringify({"updated":req.body.eventCode}));		
@@ -58,12 +58,12 @@ router.put('/', function(req, res, next){
 router.post('/', function(req,res,next) {
 	console.log("Adding Event " + req.body.eventCode);
 	console.dir(req.body);
-	if((!req.body.eventCode)||(!req.body.standarddata)){
-		res.send(JSON.stringify({"error":"'eventCode' is required"}));
+	if((!req.body.eventCode)||(!req.body.standarddata)||(!req.body.displaystructure)){
+		res.send(JSON.stringify({"error":"'eventCode', 'standarddata', and 'displaystructure' are required"}));
 		return 0;
 	}
 
-	db.none("INSERT INTO events_lookup(eventcode, standarddata) VALUES($1,$2);",[req.body.eventCode,req.body.standarddata])
+	db.none("INSERT INTO events_lookup(eventcode, standarddata, displaystructure) VALUES($1,$2,$3);",[req.body.eventCode,req.body.standarddata,req.body.displaystructure])
 		.then(function (){
 			res.status(201);
 			res.send(JSON.stringify({"created":req.body.eventCode}));		
@@ -77,7 +77,7 @@ router.post('/', function(req,res,next) {
 router.get('/:eventCode/', function(req, res, next) {
 	var response = {}
 
-	db.one("SELECT eventCode, standarddata FROM events_lookup WHERE eventCode=$1", req.params.eventCode)
+	db.one("SELECT eventCode, standarddata, displaystructure FROM events_lookup WHERE eventCode=$1", req.params.eventCode)
 		.then(function(dbResponse){
 			res.send(JSON.stringify(dbResponse));
 		})

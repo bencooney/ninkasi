@@ -135,16 +135,16 @@ function setupDatabase(dbase){
 		);`);
 	
 	dbase.none(`CREATE TABLE IF NOT EXISTS beer_events(
-			eventTime TIMESTAMP DEFAULT NOW(),
-			beerId integer REFERENCES beers ON CASCADE DELETE, 
-			eventCode VARCHAR(255), 
-			relationID VARCHAR(255), 
-			data jsonb
+			eventid BIGSERIAL PRIMARY KEY,
+			beerid integer REFERENCES beers ON CASCADE DELETE, 
+			eventcode VARCHAR(255), 
+			data jsonb,
 		);`);
 	
 	dbase.none(`CREATE TABLE IF NOT EXISTS events_lookup(
 			eventcode VARCHAR(255), 
-			standarddata jsonb
+			standarddata jsonb,
+			displaystructure TEXT
 		);`);
 
 }

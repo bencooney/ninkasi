@@ -87,13 +87,13 @@ router.get('/:beerId/', function(req, res, next) {
 	db.one("SELECT name, brewdate, beerId FROM beers WHERE beerId=$1", req.params.beerId)
 		.then(function(dbResponse){
 			response["beer"] = dbResponse;
-			db.any("SELECT eventtime,eventcode,relationid,data FROM beer_events WHERE beerid=$1 ORDER BY eventtime DESC",req.params.beerId)
+			db.any("SELECT eventid,eventcode,data FROM beer_events WHERE beerid=$1 ORDER BY eventtime DESC",req.params.beerId)
 				.then(function(beerEvents){
 					response["events"] = beerEvents;
 					res.send(JSON.stringify(response));
 				})
 				.catch(function(error){
-					processDbError(dbError, res);
+					processDbError(error, res);
 				});
 		})
 		.catch(function(dbError){
@@ -103,7 +103,16 @@ router.get('/:beerId/', function(req, res, next) {
 });
 
 
+router.post('/:beerId/events', function(req, res, next) {
 
+	db.none("INSERT INTO beer_events(beerid, eventcode, data) VALUES($1,$2,$3)", [req.params.beerId, req.body.eventcode, req.body.data])
+		.then(function(){
+			res.send(JSON.stringify({'created':'beer-event'}));
+		})
+		.catch(function(error){
+			processDbError(error, res);
+		});
+});
 
 module.exports = router;
 

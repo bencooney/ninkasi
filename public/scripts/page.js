@@ -165,7 +165,7 @@ function displayEditEventConfig(eventCode){
 
 
 
-function displayBeer(beerId){
+function displayBeer(beerId, next){
 
 
 	httpGet('/beers/' + beerId, function(beerJson){
@@ -178,8 +178,8 @@ function displayBeer(beerId){
 		beerDetails += data.beer.name + "</h3>";
 		beerDetails += "Created: " + getIsoDate(brewDate) + "<br />";
 		beerDetails += `
-			<button onclick="showDeleteBeer('`+data.beer.beerid+`')">Delete</button>
-			<button onclick="displayAddEventToBeer()">Add Event</button>
+			<input type='hidden' id='beer-beerId' value='`+beerId+`' />
+			<button onclick="displayAddEventToBeer()">Add Events</button>
 			<br />
 			<div id="beer-addEvent"></div>
 		`;
@@ -204,7 +204,7 @@ function displayBeer(beerId){
 				eventsHtml += `<tr>
 											<td>`+event.eventtime+`</td>
 											<td>`+event.eventcode+`</td>
-											<td>`+event.data.name+`</td>
+											<td>`+JSON.stringify(event.data)+`</td>
 										`;
 			}
 		});
@@ -214,14 +214,21 @@ function displayBeer(beerId){
 
 		beerDetails += ingredientsHtml;
 		beerDetails += eventsHtml;
-		beerDetails += "</div>";
+		beerDetails += `
+				<button onclick="showDeleteBeer('`+data.beer.beerid+`')">Delete Beer</button>
+			</div>
+		`;
 		setDynamicPanel(beerDetails);
+		next();
 	});
 }
 
 function displayAddEventToBeer(){
 	httpGet('/events/', function(eventsJson){
-		var html = "<select id='beer-addEvent-eventcode' onchange='displayEventsFields()'>";
+		var html = `
+			<select id='beer-addEvent-eventcode' onchange='displayEventsFields()'>
+				<option>--</option>`;
+
 		JSON.parse(eventsJson).events.forEach( function(event){
 			html += "<option>"+ event.eventcode+"</option>";
 		});
@@ -236,12 +243,23 @@ function displayEventsFields(){
 	var eventCode = document.getElementById('beer-addEvent-eventcode').value;
 	httpGet('/events/'+eventCode, function(eventJson){
 		var html = `
-			<textarea>
-				`+JSON.stringify(JSON.parse(eventJson).standarddata) + `
-			</textarea>
-			<button onclick='processAddEventToBeer()'>`;
+			<textarea id='beer-addEvent-data' cols='80' rows='10'>`+JSON.stringify(JSON.parse(eventJson).standarddata)+`</textarea>
+			<br/>
+			<button onclick='processAddEventToBeer()'>Add Event</button>`;
 		document.getElementById('beer-addEvent-fields').innerHTML = html; 
 	});
+}
+
+
+function processAddEventToBeer(){
+	var beerId = document.getElementById('beer-beerId').value;
+	var eventData = document.getElementById('beer-addEvent-data').value;
+	var eventCode = document.getElementById('beer-addEvent-eventcode').value;
+	var body = { 'eventcode' : eventCode, 'data': eventData};
+	httpPost('/beers/'+beerId+"/events", body, function(response){
+		displayBeer(beerId, displayAddEventToBeer );
+	});
+
 }
 
 function showDeleteBeer(beerId){

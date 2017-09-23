@@ -18,13 +18,14 @@ var events = require('./routes/events');
 
 //setup arduino devices to control
 var johnnyFive = require("johnny-five");
-var Raspi = require("raspi-io");
+//var Raspi = require("raspi-io");
 
 boards = new johnnyFive.Boards([
-	{id:"A",timeout:36000, port:"/dev/ttyUSB0"}
-	,{id:"fermentorTracker",timeout:36000, port:"/dev/ttyUSB1"}
-	,{id:"C",timeout:36000, port:"/dev/ttyACM0"}
-	,{id:"raspi",io: new Raspi()}
+	//{id:"A",timeout:36000, port:"/dev/ttyUSB0"}
+	//,
+	{id:"fermentorTracker",timeout:36000, port:"/dev/ttyUSB0"}
+	//,{id:"C",timeout:36000, port:"/dev/ttyACM0"}
+	//,{id:"raspi",io: new Raspi()}
 ]);
 
 boards.on("error", function(msg){

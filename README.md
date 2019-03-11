@@ -5,6 +5,7 @@ robots for beer
 ## About
 This project has probably been abandoned. It's currently running on a system that works fine but not great, and the next version will most likely be started from scratch with new hardware.
 
+There are known vulnerabilities in some of the dependencies + this is not written using secure codeing practices. If for some reason you use part of this code, you should practice common sense before making the resulting server available on non-private networks
 
 This is a npm project intended to be run on a raspberry-pi. It contains a number of tools for remote controlling utilities to aid in the automation of beer brewing.
 
